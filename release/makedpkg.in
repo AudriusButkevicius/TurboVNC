@@ -1,0 +1,83 @@
+#!/bin/sh
+
+set -u
+set -e
+trap onexit INT
+trap onexit TERM
+trap onexit EXIT
+
+TMPDIR=
+
+onexit()
+{
+	if [ ! "$TMPDIR" = "" ]; then
+		sudo rm -rf $TMPDIR
+	fi
+}
+
+safedirmove ()
+{
+	if [ "$1" = "$2" ]; then
+		return 0
+	fi
+	if [ "$1" = "" -o ! -d "$1" ]; then
+		echo safedirmove: source dir $1 is not valid
+		return 1
+	fi
+	if [ "$2" = "" -o -e "$2" ]; then
+		echo safedirmove: dest dir $2 is not valid
+		return 1
+	fi
+	if [ "$3" = "" -o -e "$3" ]; then
+		echo safedirmove: tmp dir $3 is not valid
+		return 1
+	fi
+	mkdir -p $3
+	mv $1/* $3/
+	rmdir $1
+	mkdir -p $2
+	mv $3/* $2/
+	rmdir $3
+	return 0
+}
+
+PACKAGE_NAME=@CMAKE_PROJECT_NAME_LC@
+VERSION=@VERSION@
+BUILD=@BUILD@
+DEBARCH=@DEBARCH@
+SRCDIR=@CMAKE_SOURCE_DIR@
+DOCDIR=@TVNC_DOCDIR@
+CONFDIR=@TVNC_CONFDIR@
+PREFIX=@CMAKE_INSTALL_PREFIX@
+
+umask 022
+rm -f $PACKAGE_NAME\_$DEBARCH.deb
+TMPDIR=`mktemp -d /tmp/$PACKAGE_NAME-build.XXXXXX`
+mkdir $TMPDIR/DEBIAN
+cp pkgscripts/deb-control $TMPDIR/DEBIAN/control
+
+make install DESTDIR=$TMPDIR
+make xserver-install DESTDIR=$TMPDIR
+
+if [ ! "$DOCDIR" = "/usr/share/doc/$PACKAGE_NAME-$VERSION" ]; then
+	safedirmove $TMPDIR/$DOCDIR $TMPDIR/usr/share/doc/$PACKAGE_NAME-$VERSION $TMPDIR/__tmpdoc
+fi
+if [ ! "$CONFDIR" = "/etc" ]; then
+	safedirmove $TMPDIR/$CONFDIR $TMPDIR/etc $TMPDIR/__tmpconf
+fi
+
+mkdir -p $TMPDIR/usr/share/applications
+cat > $TMPDIR/usr/share/applications/tvncviewer.desktop <<EOF
+[Desktop Entry]
+Name=TurboVNC Viewer
+Comment=TurboVNC client application
+Exec=$PREFIX/bin/vncviewer
+Terminal=0
+Type=Application
+Categories=Application;Utility;X-Red-Hat-Extra;
+EOF
+
+sudo chown -Rh root:root $TMPDIR/*
+dpkg -b $TMPDIR $PACKAGE_NAME\_$VERSION\_$DEBARCH.deb
+
+exit

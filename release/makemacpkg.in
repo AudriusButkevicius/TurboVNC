@@ -1,0 +1,112 @@
+#!/bin/sh
+
+set -u
+set -e
+trap onexit INT
+trap onexit TERM
+trap onexit EXIT
+
+TMPDIR=
+
+onexit()
+{
+	if [ ! "$TMPDIR" = "" ]; then
+		sudo rm -rf $TMPDIR
+	fi
+}
+
+safedirmove ()
+{
+	if [ "$1" = "$2" ]; then
+		return 0
+	fi
+	if [ "$1" = "" -o ! -d "$1" ]; then
+		echo safedirmove: source dir $1 is not valid
+		return 1
+	fi
+	if [ "$2" = "" -o -e "$2" ]; then
+		echo safedirmove: dest dir $2 is not valid
+		return 1
+	fi
+	if [ "$3" = "" -o -e "$3" ]; then
+		echo safedirmove: tmp dir $3 is not valid
+		return 1
+	fi
+	mkdir -p $3
+	mv $1/* $3/
+	rmdir $1
+	mkdir -p $2
+	mv $3/* $2/
+	rmdir $3
+	return 0
+}
+
+usage()
+{
+	echo "$0 [universal]"
+	exit 1
+}
+
+UNIVERSAL=0
+
+PACKAGE_NAME=@CMAKE_PROJECT_NAME@
+VERSION=@VERSION@
+BUILD=@BUILD@
+SRCDIR=@CMAKE_SOURCE_DIR@
+PREFIX=@CMAKE_INSTALL_PREFIX@
+BINDIR=@TVNC_BINDIR@
+DOCDIR=@TVNC_DOCDIR@
+JAVADIR=@TVNC_JAVADIR@
+PACKAGEMAKER=@PACKAGEMAKER_PATH@/PackageMaker.app/Contents/MacOS/PackageMaker
+
+if [ -f $PACKAGE_NAME-$VERSION.dmg ]; then
+	rm -f $PACKAGE_NAME-$VERSION.dmg
+fi
+
+umask 022
+TMPDIR=`mktemp -d /tmp/$PACKAGE_NAME-build.XXXXXX`
+PKGROOT=$TMPDIR/pkg/Package_Root
+mkdir -p $PKGROOT
+
+make install DESTDIR=$PKGROOT
+if [ -d $PKGROOT$JAVADIR ]; then
+	mv -f $PKGROOT$JAVADIR/README.txt $PKGROOT$PREFIX/
+	rm $PKGROOT$JAVADIR/*
+	rmdir $PKGROOT$JAVADIR
+fi
+
+mkdir -p $PKGROOT/Library/Documentation
+chmod 1775 $PKGROOT/Library
+chmod 775 $PKGROOT/Library/Documentation
+safedirmove $PKGROOT$DOCDIR $PKGROOT/Library/Documentation/$PACKAGE_NAME $TMPDIR/__tmpdoc
+
+mkdir -p $TMPDIR/pkg/Resources 
+cp $SRCDIR/release/License.rtf $SRCDIR/release/Welcome.rtf $SRCDIR/release/ReadMe.rtf $TMPDIR/pkg/Resources/ 
+cp pkgscripts/Description.plist $TMPDIR/pkg/
+cp pkgscripts/Info.plist $TMPDIR/pkg/
+mkdir -p $PKGROOT$BINDIR/
+install -m 755 pkgscripts/uninstall $PKGROOT$BINDIR/
+
+mkdir -p "$PKGROOT/Applications/$PACKAGE_NAME"
+chmod 775 $PKGROOT/Applications
+sh pkgscripts/makemacapp
+ln -fs /Library/Documentation/$PACKAGE_NAME/index.html "$PKGROOT/Applications/$PACKAGE_NAME/$PACKAGE_NAME User's Guide.html"
+install -m 644 @CMAKE_BINARY_DIR@/pkgscripts/uninstall.applescript $TMPDIR
+osacompile -t APPL -o "$TMPDIR/Uninstall $PACKAGE_NAME.app" $TMPDIR/uninstall.applescript
+cp -R "$PACKAGE_NAME Viewer.app" "$PKGROOT/Applications/$PACKAGE_NAME/"
+cp -R "$TMPDIR/Uninstall $PACKAGE_NAME.app" "$PKGROOT/Applications/$PACKAGE_NAME/"
+echo "\"/Applications/$PACKAGE_NAME/$PACKAGE_NAME Viewer.app/Contents/MacOS/JavaApplicationStub\" \${1+\"\$@\"}" >$PKGROOT$BINDIR/vncviewer
+chmod 755 $PKGROOT$BINDIR/vncviewer
+sudo chown -R root:admin $PKGROOT
+
+mkdir $TMPDIR/dmg
+$PACKAGEMAKER -build -v -p "$TMPDIR/dmg/$PACKAGE_NAME.pkg" -f $PKGROOT \
+	-r $TMPDIR/pkg/Resources -i $TMPDIR/pkg/Info.plist \
+	-d $TMPDIR/pkg/Description.plist
+mv "$TMPDIR/Uninstall $PACKAGE_NAME.app" $TMPDIR/dmg/
+sudo chown -R $USER "$TMPDIR/dmg/Uninstall $PACKAGE_NAME.app"
+hdiutil create -fs HFS+ -volname $PACKAGE_NAME-$VERSION \
+	-srcfolder "$TMPDIR/dmg" $TMPDIR/$PACKAGE_NAME-$VERSION.dmg
+cp $TMPDIR/$PACKAGE_NAME-$VERSION.dmg . 
+
+exit

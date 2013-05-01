@@ -1,0 +1,112 @@
+* Obtaining and Installing TurboVNC
+
+** Installing TurboVNC on Linux
+
+*** Font Dependencies
+#OPT: noList! plain!
+
+On some Linux distributions, most notably Fedora 10 and later, the basic X11
+bitmap fonts are not installed by default.  Thus, it is necessary to install
+the ''xorg-x11-fonts-misc'' package on these distributions prior to starting a
+TurboVNC session for the first time.  Otherwise, TurboVNC will fail with the
+following error:
+
+	#Verb <<---
+	Fatal server error:
+	could not open default font 'fixed'
+	---
+
+*** Installing TurboVNC
+#OPT: noList! plain!
+
+	1. Download the appropriate TurboVNC binary package for your system from the
+		[[http://sourceforge.net/projects/virtualgl/files/TurboVNC/][Files area]]
+		of the [[http://sourceforge.net/projects/virtualgl][VirtualGL SourceForge project page]].
+		Packages are provided for Linux distributions in the
+		[[http://www.redhat.com/][Red Hat]],
+		[[http://www.novell.com/linux/][SuSE]], or
+		[[http://www.debian.org/][Debian]] families that contain GLIBC 2.3.2
+		or later (including [[http://fedoraproject.org/][Fedora]],
+		[[http://www.centos.org/][CentOS]] 3 or later,
+		[[http://www.oracle.com/us/technologies/linux/][Oracle Linux]],
+		and [[http://www.ubuntu.com/][Ubuntu Linux]] v6.0 or later.)
+		{nl}
+
+	2. Log in as root, cd to the directory where you downloaded the binary
+		package, and issue one of the following commands:
+
+		RPM-based systems :: {:}
+		#Verb <<---
+		rpm -U turbovnc*.rpm
+		---
+
+		Debian-based systems :: {:}
+		#Verb <<---
+		dpkg -i turbovnc*.deb
+		---
+
+** Installing the TurboVNC Viewer on OS X
+
+	#. Download the TurboVNC Mac disk image
+		(''TurboVNC-''__''{version}''__''.dmg'') from the
+		[[http://sourceforge.net/projects/virtualgl/files/TurboVNC/][Files area]]
+		of the [[http://sourceforge.net/projects/virtualgl][VirtualGL SourceForge project page]].
+
+	#. Open the disk image, then open ''TurboVNC.pkg'' inside the
+		disk image.  Follow the instructions to install the Mac TurboVNC Viewer.
+
+** Installing the TurboVNC Viewer on Windows
+
+	#. Download the TurboVNC Windows installer package
+		(''TurboVNC-''__''{version}''__''.exe'' for 32-bit systems or
+		''TurboVNC64-''__''{version}''__''.exe'' for 64-bit systems) from the
+		[[http://sourceforge.net/projects/virtualgl/files/TurboVNC/][Files area]]
+		of the [[http://sourceforge.net/projects/virtualgl][VirtualGL SourceForge project page]].
+
+	#. Run the TurboVNC installer.  The installation of TurboVNC should be
+		self-explanatory.  The only configuration option is the directory into
+		which you want the files to be installed.
+
+** Installing TurboVNC from Source
+
+If you are using a Unix platform for which there is not a pre-built TurboVNC
+binary package available, then log in as root, download the TurboVNC source
+tarball (''turbovnc-''__''{version}''__''.tar.gz'') from the 
+[[http://sourceforge.net/projects/virtualgl/files/TurboVNC/][Files area]]
+of the [[http://sourceforge.net/projects/virtualgl][VirtualGL SourceForge project page]],
+uncompress it, ''cd turbovnc-''__''{version}''__, and read ''BUILDING.txt''
+for further instructions on how to build TurboVNC from source.
+
+** Uninstalling TurboVNC
+
+*** Linux
+#OPT: noList! plain!
+
+As root, issue one of the following commands:
+
+	RPM-based systems :: {:}
+	#Verb: <<---
+	rpm -e turbovnc
+	---
+
+	Debian-based systems :: {:}
+	#Verb: <<---
+	dpkg -r turbovnc
+	---
+
+*** OS X
+#OPT: noList! plain!
+
+Open the "Uninstall TurboVNC" application, located in the "TurboVNC"
+Applications folder.  You can also open a terminal and execute:
+
+#Verb: <<---
+sudo /opt/TurboVNC/bin/uninstall
+---
+
+*** Windows
+#OPT: noList! plain!
+
+Use the "Programs and Features" applet in the Control Panel (or the
+"Add or Remove Programs" applet if you are running Windows XP), or select
+"Uninstall TurboVNC" in the "TurboVNC" Start Menu group.

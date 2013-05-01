@@ -1,0 +1,453 @@
+'\" t
+.\" ** The above line should force tbl to be a preprocessor **
+.\" Man page for Xvnc
+.\"
+.\" Copyright (C) 1998 Marcus.Brinkmann@ruhr-uni-bochum.de
+.\" Copyright (C) 2000, 2001 Red Hat, Inc.
+.\" Copyright (C) 2001, 2002 Constantin Kaplinsky
+.\" Copyright (C) 2005-2008 Sun Microsystems, Inc.
+.\" Copyright (C) 2010, 2012 D. R. Commander
+.\" Copyright (C) 2010 University Corporation for Atmospheric Research
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file LICENCE.TXT that comes with the
+.\" TightVNC distribution.
+.\"
+.TH Xvnc 1 "Nov 2012" "" "TurboVNC"
+.SH NAME
+Xvnc \- an X server providing VNC connectivity
+.SH SYNOPSIS
+.TP
+\fBXvnc\fR
+[:\fIdisplay\fR]
+[\-geometry \fIwidth\fRx\fIheight\fR] [\-depth \fIdepth\fR]
+[\-pixelformat rgb\fINNN\fR|bgr\fINNN\fR] [\-udpinputport \fIport\fR]
+[\-rfbport \fIport\fR] [\-rfbwait \fItime\fR] [\-nocursor]
+[\-rfbauth \fIpasswd-file\fR] [\-otpauth] [\-pamauth]
+[\-noreverse] [\-noclipboardsend] [\-noclipboardrecv]
+[\-idletimeout \fItime\fR] [\-httpd \fIdir\fR]
+[\-httpport \fIport\fR] [\-deferupdate \fItime\fR] [\-noflowcontrol]
+[\-alr \fItime\fR]
+[\-alrqual \fIlevel\fR] [\-alrsamp \fI1X | 2X | 4X | gray\fR]
+[\-interframe] [\-nointerframe]
+[\-economictranslate] [\-desktop \fIname\fR] [\-alwaysshared]
+[\-nevershared] [\-dontdisconnect] [\-viewonly] [\-localhost]
+[\-interface ipaddr] [\-ipv6] [\-inetd] [\-compatiblekbd]
+[\fIX-options\fR...]
+.SH DESCRIPTION
+\fBXvnc\fR is a VNC (Virtual Network Computing) server for Unix and Linux
+systems.  It acts like a normal X server, except that it sends its output
+to a virtual rather than a physical display.  Remote machines can connect
+to the VNC server and see/control the output of this virtual display
+[see \fBvncviewer\fR(1).]  Xvnc is built using the XFree86 source code and
+shares many options with it.
+
+Normally, you don't need to start Xvnc manually-- use the
+\fBvncserver\fR(1) wrapper script instead.  This script sets reasonable
+defaults for the Xvnc session, checks many error conditions, etc.
+
+Please read the SECURITY CONCERNS section if you plan to use VNC on an
+untrusted network.
+.SH OPTIONS
+Xvnc supports many standard X server options and a number of
+VNC-specific options.  To see which standard X server options are
+supported, please look at the output of \fBXvnc\fR \fI\-help\fR and read
+the \fBXserver\fR(1) manual page.
+
+The VNC-specific options are as follows:
+.TP
+\fB\-geometry\fR \fIwidth\fR\fBx\fR\fIheight\fR
+Set width and height of the virtual X display.
+.TP
+\fB\-pixelformat\fR \fBrgb\fR\fINNN\fR|\fBbgr\fR\fINNN\fR
+Specify the pixel format of the virtual X display.  Xvnc can use any pixel
+format you choose, but if this pixel format does not match the pixel format
+of the display on which vncviewer is running, then Xvnc will perform pixel
+format conversion prior to sending images to vncviewer.  This can slow
+performance.  The default pixel format, rgb888, is equivalent to BGRA on little
+endian systems or ARGB on big endian systems.  A pixel format of bgr888 is
+equivalent to RGBA on little endian systems or ABGR on big endian systems.
+.TP
+\fB\-udpinputport\fR \fIport\fR
+UDP port for keyboard/pointer data.
+.TP
+\fB\-rfbport\fR \fIport\fR
+TCP port that the server should use when listening for connections from normal
+VNC clients.
+.TP
+\fB\-rfbwait\fR \fItime\fR
+Maximum time, in milliseconds, to wait for an RFB client (VNC viewer.)
+.TP
+\fB\-nocursor\fR
+Don't display a mouse pointer on the remote desktop.
+.TP
+\fB\-rfbauth\fR \fIpasswd-file\fR
+Enable the VNC password authentication method and read the VNC password from
+the specified file.  The \fIpasswd-file\fR can be created using the
+\fBvncpasswd\fR(1) utility.  This argument has no effect if
+\fIpermitted-auth-methods\fR is specified in the authentication configuration
+file and "vnc" is not listed as a permitted method.
+.TP
+\fB\-otpauth\fR
+Enable the one-time password (OTP) authentication method.  One-time passwords
+for full control or view-only access can be created using the
+\fBvncpasswd\fR(1) utility.  OTPs are discarded by Xvnc immediately after they
+are used, so an additional OTP must be generated before another user is allowed
+to connect using this method.  This argument has no effect if
+\fIpermitted-auth-methods\fR is specified in the authentication configuration
+file and "otp" is not listed as a permitted method.
+.TP
+\fB\-pamauth\fR
+Enable the PAM user/password authentication method, which supports the
+"Unix login" authentication scheme.  Additional configuration is necessary
+to make this work (see the AUTHENTICATION CONFIGURATION FILE section for
+details.)  This argument has no effect if \fIpermitted-auth-methods\fR is
+specified in the authentication configuration file and "pam-userpwd" is not
+listed as a permitted method.
+.TP
+\fB\-noreverse\fR
+Do not allow reverse VNC connections to be made from this Xvnc session.
+This option can be set for all TurboVNC sessions on this system by using the
+\fIno-reverse-connections\fR directive in the authentication configuration
+file.  See the AUTHENTICATION CONFIGURATION FILE section for more details.
+.TP
+\fB-noclipboardsend\fR
+Disable outbound clipboard synchronization.  This prevents the clipboard of
+any connected viewers from being synchronized with the clipboard of the
+TurboVNC session whenever the latter changes.  This option can be set for all
+TurboVNC sessions on this system by using the \fIno-clipboard-send\fR
+directive in the authentication configuration file.  See the AUTHENTICATION
+CONFIGURATION FILE section for more details.
+.TP
+\fB-noclipboardrecv\fR
+Disable inbound clipboard synchronization.  This prevents the clipboard of
+the TurboVNC session from being synchronized with the clipboard of a connected
+viewer whenever the latter changes.  This option can be set for all
+TurboVNC sessions on this system by using the \fIno-clipboard-recv\fR
+directive in the authentication configuration file.  See the AUTHENTICATION
+CONFIGURATION FILE section for more details.
+.TP
+\fB\-idletimeout\fR \fItime\fR
+Time, in seconds, which the TurboVNC Server can sit idle (with no VNC viewer
+connections) before it automatically exits (default: no timeout.)  This
+argument has no effect if the \fImax-idle-timeout\fR directive is specified in
+the authentication configuration file and if that value is lower than
+\fItime\fR.
+.TP
+\fB\-httpd\fR \fIdir\fR
+Specify directory where the Java viewer classes are located.
+.TP
+\fB\-httpport\fR \fIport\fR
+TCP port that the server should use when listening for connections from
+Java-enabled web browsers.
+.TP
+\fB\-deferupdate\fR \fItime\fR
+Time, in milliseconds, for which to defer screen updates (default: 40).
+Deferring updates helps to coalesce many small desktop changes into a few
+larger updates, thus saving network bandwidth.
+.TP
+\fB\-noflowcontrol\fR
+Normally, the TurboVNC Server will use the RFB flow control extensions
+(Continuous Updates and Fence) with any connected viewers that support them.
+These extensions allow the server to send framebuffer updates at the maximum
+rate that the network connection and the viewer can handle, instead of waiting
+for viewers to explicitly request updates.  Disabling flow control causes the
+TurboVNC Server to send framebuffer updates at the maximum rate that the
+network connection can handle, irrespective of the viewer.  For full-screen
+video and 3D applications, this may produce smoother animation on high-latency
+networks, although it will almost certainly also produce a noticeable lag
+between mouse movement and application response, since the TCP buffers will be
+100% full.
+.TP
+\fB\-alr\fR \fItime\fR
+Enable the automatic lossless refresh (ALR) feature for this Xvnc session and
+set the timeout to \fItime\fR seconds.  If ALR is enabled and no framebuffer
+updates have been sent to a given client in the past \fItime\fR seconds, and if
+"eligible" areas of the screen have been transmitted to that client using JPEG
+since the last lossless refresh, then those areas of the screen are
+re-transmitted using mathematically lossless image compression (specifically,
+the Lossless Tight + Zlib encoding method.)
+
+The default ALR behavior is that only regions that were drawn using
+X[Shm]PutImage() are eligible for ALR.  This is designed to work in conjunction
+with VirtualGL and to prevent blinking cursors from confusing the ALR
+algorithm.  You can, however, set the \fBTVNC_ALRALL\fR environment variable to
+\fB1\fR to make all screen regions eligible for ALR.
+.TP
+\fB\-alrqual\fR \fIlevel\fR
+Instead of sending a mathematically lossless image for an automatic lossless
+refresh, send a JPEG image with the specified JPEG quality (95 is a good
+choice, as this is the equivalent of the "Tight + Perceptually Lossless JPEG"
+preset.)
+.TP
+\fB\-alrsamp\fR \fI1X | 2X | 4X | gray\fR
+Specify the level of chrominance subsampling to be used when sending an
+automatic lossless refresh (default: 1X.)  This has no effect unless
+\fI-alrqual\fR is also specified.
+.TP
+\fB\-interframe\fR
+Normally, the TurboVNC Server will enable interframe comparison whenever
+Compression Level 5 or above is requested (if using Tight encoding, compression
+levels 5-7 are equivalent to compression levels 0-2 with interframe comparison
+enabled.)  Specifying \fB-interframe\fR will enable interframe comparison all
+the time, regardless of the compression level that was requested by the viewer.
+Interframe comparison maintains a copy of the remote framebuffer for each
+connected viewer and compares each framebuffer update with the copy to ensure
+that redundant updates are not sent to the viewer.  This prevents unnecessary
+network traffic if an ill-behaved application draws the same thing over and
+over again, but interframe comparison also causes the TurboVNC Server to use
+more CPU time and much more memory, and thus it is recommended that this
+feature be used only when needed.
+.TP
+\fB\-nointerframe\fR
+Specifying this option will disable interframe comparison, regardless of the
+compression level that was requested by the viewer.
+.TP
+\fB\-economictranslate\fR
+Use less memory-hungry pixel format translation.
+.TP
+\fB\-desktop\fR \fIname\fR
+Set VNC desktop name ("x11" by default).
+.TP
+\fB\-alwaysshared\fR
+Always treat new connections as shared.  Never disconnect existing users
+or deny new connections when a new user tries to connect to a VNC session that
+is already occupied.
+.TP
+\fB\-nevershared\fR
+Never treat new connections as shared.  Do not allow simultaneous user
+connections to the same VNC session.
+.TP
+\fB\-dontdisconnect\fR
+Don't disconnect existing users when a new non-shared connection is
+established.  Instead, refuse the new connection.  The vncserver script
+for TurboVNC sets this as the default, but you can modify the script
+if you want to change the behavior.
+.TP
+\fB\-viewonly\fR
+Don't accept keyboard and pointer events from clients.  All clients will
+be able to see the desktop but won't be able to control it.
+.TP
+\fB\-localhost\fR
+Only allow loopback connections from localhost.  This option is useful
+in conjunction with SSH tunneling.  This option can be set for all TurboVNC
+sessions on this system by using the \fIno-remote-connections\fR directive in
+the authentication configuration file.  See the AUTHENTICATION CONFIGURATION
+FILE section for more details.  Unless \fB-ipv6\fR is also specified, only
+connections from IPv4 clients are accepted.
+.TP
+\fB\-interface\fR \fIipaddr\fR
+Listen only on the network interface with the given \fIipaddr\fR.
+.TP
+\fB\-ipv6\fR
+Enable IPv6 support.  If your system supports IPv4-mapped IPv6 addresses, then
+this option causes Xvnc to accept both local and remote connections from both
+IPv4 and IPv6 clients.  Otherwise, only connections from IPv6 clients will be
+accepted.  If \fB-localhost\fR is also specified, or if the
+\fIno-remote-connections\fR directive is specified in the authentication
+configuration file, then this option causes Xvnc to accept only local
+connections from IPv6 clients (the equivalent of specifying
+\fB-interface ::1\fR).
+.TP
+\fB\-inetd\fR
+If Xvnc is launched by inetd, this option causes Xvnc to redirect
+network input/output to stdin/stdout.
+.TP
+\fB\-compatiblekbd\fR
+Set META and ALT keys to the same X modifier flag, as in the original
+version of Xvnc by AT&T labs (this option is specific to TightVNC/TurboVNC.)
+.SH AUTHENTICATION OVERVIEW
+The Xvnc server supports the following methods for authenticating a VNC
+client connection:
+.IP \fBnone\fR
+No authentication required.  Starting Xvnc with no authentication command-line
+arguments sets the authentication method to "none".  If
+\fIpermitted-auth-methods\fR is specified in the authentication configuration
+file and "none" is not listed as a permitted method, then Xvnc exits with an
+error.
+
+This authentication method can be used with VNC clients that understand the
+RFB "None" security type or the "Tight" security type with the "None"
+authentication scheme.
+.IP \fBvnc\fR
+VNC password authentication using a password set by the \fBvncpasswd\fR(1)
+utility.  This method is enabled with the \fB-rfbauth\fR command-line argument
+to Xvnc.  Additionally, if \fIpermitted-auth-methods\fR is specified in the
+authentication configuration file, then "vnc" must be listed as a permitted
+method.
+
+This authentication method can be used with VNC clients that understand the RFB
+"VNC" security type or the "Tight" security type with the "VNC" authentication
+scheme.
+.IP \fBotp\fR
+One-time password (OTP) authentication using an OTP generated by the
+\fBvncpasswd\fR(1) utility.  This method is enabled by passing a command-line
+argument of \fB-otpauth\fR to Xvnc.  Additionally, if
+\fIpermitted-auth-methods\fR is specified in the authentication configuration
+file, then "otp" must be listed as a permitted method.
+
+This authentication method can be used with any VNC client that supports
+standard VNC authentication.  OTP authentication is handy for sharing
+a VNC session with another person with whom you do not wish to share your
+VNC password.
+.IP \fBpam-userpwd\fR
+User/password authentication using Pluggable Authentication Modules (PAM).
+This is typically used to authenticate against Unix login credentials, but it
+can also be used to authenticate against any other user/password authentication
+credentials that can be accessed through PAM.  The PAM user/password
+authentication method is enabled by passing a command-line argument of
+\fB-pamauth\fR to Xvnc.  Additionally, if \fIpermitted-auth-methods\fR is
+specified in the authentication configuration file, then "pam-userpwd" must be
+listed as a permitted method.  Also, a valid PAM service configuration must
+have been created by the system administrator (see the AUTHENTICATION
+CONFIGURATION FILE section for details), and on some systems, it may be
+necessary to make the Xvnc binary setuid root.
+
+This authentication method can be used only with VNC clients that understand
+the RFB protocol "Tight" security type with the "Unix login" authentication
+scheme.
+.P
+The authentication method that will be selected when a VNC client connects
+depends on the following:
+.TP
+\fBCommand-line authentication options\fR
+The authentication options (\fB-rfbauth\fR, \fB-otpauth\fR and \fB-pamauth\fR)
+allow you to request that the VNC password, OTP, and PAM user/password
+authentication methods be enabled in Xvnc, respectively.  If none of these
+options is specified, then this is the equivalent of requesting that no
+authentication be used.
+.TP
+\fBThe \fIpermitted-auth-methods\fB directive\fR
+If the authentication configuration file exists, then the system administrator
+can use the \fIpermitted-auth-methods\fR directive in this file to specify the
+authentication methods that are allowed on the system.  An authentication
+method must be both requested, by way of the Xvnc command-line options, and
+permitted in order for it to be enabled.  If none of the authentication methods
+meet this criteria, then Xvnc exits with an error.  For instance, if
+"pam-userpwd" is the only permitted authentication method, then it is an error
+to start Xvnc without an argument of \fB-pamauth\fR.
+
+The \fIpermitted-auth-methods\fR directive also allows you to specify the order
+in which authentication schemes are advertised to VNC clients.  For
+instance, if "pam-userpwd" is listed first, then the TurboVNC Viewer will
+default to using Unix login authentication when connecting to any TurboVNC
+sessions on this server.  Similarly, if "vnc" or "otp" is listed first, then
+the TurboVNC Viewer will default to using standard VNC authentication.
+
+If the authentication configuration file does not exist or
+\fIpermitted-auth-methods\fR is not specified, then Xvnc behaves as if
+\fIpermitted-auth-methods\fR was set to "vnc, otp, pam-userpwd, none".
+.TP
+\fBThe negotiated RFB protocol version\fR
+This is determined by the VNC client's capabilities.  Older VNC clients that
+support RFB version 3.3 can only use the "none", "vnc" and "otp"
+authentication methods.  Newer clients that support RFB 3.7 or 3.8 with the
+Tight VNC security type extension can use the "pam-userpwd" authentication
+method, if the client has implemented it.
+
+Authentication will fail if a VNC client that doesn't support the Tight VNC
+security type extension connects to a TurboVNC server that only allows the
+"pam-userpwd" authentication method.
+.TP
+\fBThe VNC client user interface\fR
+The VNC client's user interface may place additional restrictions on what
+authentication methods can be used.  For example, the TurboVNC Viewer has
+command-line options that allow you to force the use of the VNC or Unix
+login authentication schemes, regardless of which the server advertises as
+the default.
+.P
+You can examine the Xvnc log file to see details of authentication
+processing, including the authentication methods, RFB protocol versions,
+and security types that have been enabled.
+.SH AUTHENTICATION CONFIGURATION FILE
+At startup, Xvnc reads authentication configuration information from
+\fB/etc/turbovncserver-auth.conf\fR.  For security reasons, this pathname
+is hard-coded into the Xvnc executable and cannot be changed without rebuilding
+Xvnc.  If present, the authentication configuration file must be owned by
+either root or by the user who started the Xvnc server, and the file may not be
+writable by others.
+
+Comment lines start with a hash (#) character.  Spaces and tabs are
+ignored on lines containing configuration directives.  The configuration
+directives are:
+
+.IP \fIenable-user-acl\fR
+If the "pam-userpwd" authentication method is used, then this directive enables
+the Xvnc server's internal user access control list (ACL) to further limit
+which users will be permitted to attempt PAM authentication.  Users can be
+added to or removed from this list using the \fBvncpasswd\fR(1) utility.  The
+user who started the Xvnc server will automatically be added to the access
+control list.
+.IP \fImax-idle-timeout\fR=\fItime\fR
+This specifies the maximum idle timeout (in seconds) for all TurboVNC sessions
+running on this machine.  The idle timeout is the amount of time that a
+TurboVNC session can remain idle (with no VNC viewer connections) before
+Xvnc automatically exits.  If this value is set to a number greater than 0,
+then all TurboVNC sessions on this machine will use this idle timeout value by
+default, and the user will only be allowed to override it with a lower value.
+.IP \fIno-clipboard-send\fR
+This prevents any TurboVNC server sessions running on this machine from
+sending clipboard changes to their connected viewers.
+.IP \fIno-clipboard-recv\fR
+This prevents any TurboVNC server sessions running on this machine from
+receiving clipboard changes from their connected viewers.
+.IP \fIno-reverse-connections\fR
+Do not allow reverse connections to be made from any TurboVNC server running on
+this machine.  This causes Xvnc to ignore requests from the
+\fBvncconnect\fR(1) utility.
+.IP \fIno-remote-connections\fR
+Do not allow inbound remote connections to be made to any TurboVNC server
+running on this machine.  Only connections from localhost can be made, which
+effectively forces the use of SSH tunneling to make inbound remote connections.
+.IP \fIpam-service-name\fR=\fIsvcname\fR
+Sets the service name to be used when Xvnc performs PAM authentication.  The
+default service name is \fIturbovnc\fR.  This typically corresponds to a file
+in \fB/etc/pam.d\fR or to a token in \fB/etc/pam.conf\fR.  For instance, if
+your system has a file named \fB/etc/pam.d/passwd\fR, then copying this file to
+\fB/etc/pam.d/{svcname}\fR would cause the username and password sent by the
+VNC viewer to be validated against \fB/etc/passwd\fR.
+.IP \fIpermitted-auth-methods\fR=\fImethod\fR[,\fImethod\fR[...]]
+Defines the initial set of permitted authentication methods.  Multiple
+comma-separated methods may be specified.  Accepted values for \fImethod\fR
+are: \fInone\fR, \fIvnc\fR, \fIotp\fR, and \fIpam-userpwd\fR.  The order in
+which these methods are specified defines the order in which Xvnc will
+advertise the corresponding RFB security types and authentication schemes
+to the VNC client.  This ordering may affect which authentication scheme
+the VNC client chooses as its default.
+.SH SECURITY CONCERNS
+.P
+There are many security problems inherent in VNC.  Thus, it is
+recommended that you restrict network access to Xvnc servers from untrusted
+network addresses.  Probably the best way to secure an Xvnc server is to
+allow only loopback connections from the server machine (using the
+\fB\-localhost\fR option) and to use SSH tunneling for remote access
+to the Xvnc server.  For details on using TurboVNC with SSH tunneling, see the
+TurboVNC User's Guide.
+.P
+It is incumbent upon the system administrator to ensure that an authentication
+method meets the security requirements for a particular site before it is
+permitted to be used.  In particular, caution should be exercised when using
+authentication methods that support the Unix login authentication scheme.
+Unless SSH tunneling or another suitable encryption mechanism is enforced, then
+the use of Unix login authentication will result in Unix passwords being sent
+unencrypted over the network.
+.SH SEE ALSO
+\fBvncserver\fR(1), \fBvncviewer\fR(1), \fBvncpasswd\fR(1),
+\fBvncconnect\fR(1), \fBsshd\fR(1)
+.SH AUTHORS
+VNC was originally developed at AT&T Laboratories Cambridge.  TightVNC
+additions were implemented by Constantin Kaplinsky.  TurboVNC, based
+on TightVNC, is provided by The VirtualGL Project.  Many other people
+participated in development, testing and support.
+
+\fBMan page authors:\fR
+.br
+Marcus Brinkmann <Marcus.Brinkmann@ruhr-uni-bochum.de>
+.br
+Tim Waugh <twaugh@redhat.com>
+.br
+Constantin Kaplinsky <const@tightvnc.com>
+.br
+D. R. Commander <information@virtualgl.org>
+.br
+Craig Ruff <cruff@ucar.edu>

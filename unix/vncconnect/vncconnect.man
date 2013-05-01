@@ -1,0 +1,38 @@
+'\" t
+.\" ** The above line should force tbl to be a preprocessor **
+.\" Man page for X vncconnect
+.\"
+.\" Copyright (C) 2000,2001 Red Hat, Inc.
+.\" Copyright (C) 2001-2003 Constantin Kaplinsky
+.\" Copyright (C) 2005-2008 Sun Microsystems, Inc.
+.\" Copyright (C) 2010 D. R. Commander.
+.\"
+.\" You may distribute under the terms of the GNU General Public
+.\" License as specified in the file LICENCE.TXT that comes with the
+.\" TightVNC distribution.
+.\"
+.TH vncconnect 1 "June 2010" "" "TurboVNC"
+.SH NAME
+vncconnect \- connect a VNC server to a VNC viewer
+.SH SYNOPSIS
+.nf
+\fBvncconnect\fR [\-display \fIXvnc-display\fR] \fIhost\fR[:\fIport\fR]
+.fi
+.SH DESCRIPTION
+Tells \fBXvnc\fR(1) to connect to a listening VNC viewer on the given
+host and port.
+.SH SEE ALSO
+\fBvncviewer\fR(1), \fBvncserver\fR(1), \fBXvnc\fR(1), \fBvncpasswd\fR(1)
+.SH AUTHORS
+VNC was originally developed at AT&T Laboratories Cambridge. TightVNC
+additions were implemented by Constantin Kaplinsky. TurboVNC, based
+on TightVNC, is provided by The VirtualGL Project. Many other people
+participated in development, testing and support.
+
+\fBMan page authors:\fR
+.br
+Tim Waugh <twaugh@redhat.com>
+.br
+Constantin Kaplinsky <const@tightvnc.com>
+.br
+D. R. Commander <information@virtualgl.org>
