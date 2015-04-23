@@ -553,6 +553,8 @@ public class VncViewer extends java.applet.Applet implements Runnable {
       title = "TurboVNC Viewer : Unexpected Error";
       e.printStackTrace();
     }
+    if (!opts.allowPopups)
+      return;
     JOptionPane pane = new JOptionPane(msg, msgType);
     JDialog dlg = pane.createDialog(null, title);
     dlg.setAlwaysOnTop(true);
@@ -681,6 +683,7 @@ public class VncViewer extends java.applet.Applet implements Runnable {
       opts.span = Options.SPAN_AUTO;
 
     opts.disconnectKey = disconnectKey.getValue();
+    opts.allowPopups = allowPopups.getValue();
 
     opts.scalingFactor = Integer.parseInt(scalingFactor.getDefaultStr());
     opts.setScalingFactor(scalingFactor.getValue());
@@ -838,6 +841,10 @@ public class VncViewer extends java.applet.Applet implements Runnable {
   static IntParameter disconnectKey
   = new IntParameter("DisconnectKey",
   "The key code used to disconnect the session.", 0);
+
+  static BoolParameter allowPopups
+  = new BoolParameter("AllowPopups",
+  "Allow warning and error popups when session terminates unexpectedly.", true);
 
   static StringParameter scalingFactor
   = new StringParameter("Scale",

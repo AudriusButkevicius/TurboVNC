@@ -66,6 +66,7 @@ public class Options {
     extSSH = old.extSSH;
     if (old.sshUser != null) sshUser = new String(old.sshUser);
     disconnectKey = old.disconnectKey;
+    allowPopups = old.allowPopups;
   }
 
   public static int parseScalingFactor(String scaleString) {
@@ -144,6 +145,7 @@ public class Options {
     printOpt("extSSH", extSSH);
     printOpt("sshUser", sshUser);
     printOpt("disconnectKey", disconnectKey);
+    printOpt("allowPopups", allowPopups);
   }
 
   public String serverName;
@@ -173,4 +175,5 @@ public class Options {
   public boolean extSSH;
   public String sshUser;
   public int disconnectKey;
+  public boolean allowPopups;
 }
