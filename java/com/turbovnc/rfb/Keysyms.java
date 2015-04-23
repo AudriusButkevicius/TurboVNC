@@ -120,4 +120,6 @@ public class Keysyms {
   public static final int KP_Subtract = 0xFFAD;
   public static final int KP_Multiply = 0xFFAA;
   public static final int KP_Divide = 0xFFAF;
+
+  public static final int VoidSymbol = 0xFFFFFF;
 }

@@ -60,7 +60,8 @@ public class MenuKey {
     new MenuKeySymbol("Delete", KeyEvent.VK_DELETE, Keysyms.Delete),
     new MenuKeySymbol("Home", KeyEvent.VK_HOME, Keysyms.Home),
     new MenuKeySymbol("PageUp", KeyEvent.VK_PAGE_UP, Keysyms.Prior),
-    new MenuKeySymbol("PageDown", KeyEvent.VK_PAGE_DOWN, Keysyms.Next)
+    new MenuKeySymbol("PageDown", KeyEvent.VK_PAGE_DOWN, Keysyms.Next),
+    new MenuKeySymbol("None", KeyEvent.VK_UNDEFINED, Keysyms.VoidSymbol)
   };
 
   static int getMenuKeySymbolCount() {
