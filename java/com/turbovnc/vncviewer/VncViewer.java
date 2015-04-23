@@ -680,6 +680,8 @@ public class VncViewer extends java.applet.Applet implements Runnable {
     else
       opts.span = Options.SPAN_AUTO;
 
+    opts.disconnectKey = disconnectKey.getValue();
+
     opts.scalingFactor = Integer.parseInt(scalingFactor.getDefaultStr());
     opts.setScalingFactor(scalingFactor.getValue());
 
@@ -832,6 +834,10 @@ public class VncViewer extends java.applet.Applet implements Runnable {
   = new StringParameter("MenuKey",
   "The key used to display the popup menu", "F8",
   MenuKey.getMenuKeyValueStr());
+
+  static IntParameter disconnectKey
+  = new IntParameter("DisconnectKey",
+  "The key code used to disconnect the session.", 0);
 
   static StringParameter scalingFactor
   = new StringParameter("Scale",

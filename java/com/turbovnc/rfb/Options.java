@@ -65,6 +65,7 @@ public class Options {
     tunnel = old.tunnel;
     extSSH = old.extSSH;
     if (old.sshUser != null) sshUser = new String(old.sshUser);
+    disconnectKey = old.disconnectKey;
   }
 
   public static int parseScalingFactor(String scaleString) {
@@ -142,6 +143,7 @@ public class Options {
     printOpt("tunnel", tunnel);
     printOpt("extSSH", extSSH);
     printOpt("sshUser", sshUser);
+    printOpt("disconnectKey", disconnectKey);
   }
 
   public String serverName;
@@ -170,4 +172,5 @@ public class Options {
   public boolean tunnel;
   public boolean extSSH;
   public String sshUser;
+  public int disconnectKey;
 }

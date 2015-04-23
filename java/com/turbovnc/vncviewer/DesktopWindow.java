@@ -512,6 +512,11 @@ class DesktopWindow extends JPanel implements Runnable, MouseListener,
       e.consume();
       return;
     }
+    if (e.getKeyCode() == cc.opts.disconnectKey) {
+      cc.close();
+      e.consume();
+      return;
+    }
     int ctrlAltShiftMask = Event.SHIFT_MASK | Event.CTRL_MASK | Event.ALT_MASK;
     if ((e.getModifiers() & ctrlAltShiftMask) == ctrlAltShiftMask) {
       switch (e.getKeyCode()) {
